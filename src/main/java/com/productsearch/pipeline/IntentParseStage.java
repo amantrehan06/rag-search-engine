@@ -26,46 +26,50 @@ public class IntentParseStage {
     private final ProductPipelineTracer tracer;
     private final Map<String, ProductSearchIntent> accumulator = new ConcurrentHashMap<>();
 
-    public void run(SearchContext ctx) {
-        IntentParserResult result = tracer.traceIntentParse(() -> parser.parseProductIntentWithRawJson(ctx.combinedQuery));
+    public IntentResult run(String combinedQuery, String sessionId, String originalMessage) {
+        IntentParserResult result = tracer.traceIntentParse(() -> parser.parseProductIntentWithRawJson(combinedQuery));
 
-        ctx.intent = result.intent();
-        ctx.llmJsonResponse = result.rawJson();
-        ctx.intentConfidence = ctx.intent.getConfidence();
+        ProductSearchIntent intent = result.intent();
+        String rawJson = result.rawJson();
+        double confidence = intent.getConfidence() != null
+                ? intent.getConfidence()
+                : ProductSearchConstants.DEFAULT_CONFIDENCE;
 
-        ProductSearchIntent prior = accumulator.get(ctx.sessionId);
-        if (prior != null) merge(prior, ctx.intent);
-        accumulator.put(ctx.sessionId, ctx.intent);
+        ProductSearchIntent prior = accumulator.get(sessionId);
+        if (prior != null) merge(prior, intent);
+        accumulator.put(sessionId, intent);
 
-        Double c = ctx.intent.getConfidence();
-        ctx.stepsBuilder.intentParser(ProductSearchSteps.IntentParserStep.builder()
-                .originalQuery(ctx.request.getMessage())
-                .llmResponse(ctx.llmJsonResponse)
-                .confidence(String.valueOf(c != null ? c : ProductSearchConstants.DEFAULT_CONFIDENCE))
-                .missingFields(ctx.intent.getMissingFields())
+        ProductSearchSteps.IntentParserStep step = ProductSearchSteps.IntentParserStep.builder()
+                .originalQuery(originalMessage)
+                .llmResponse(rawJson)
+                .confidence(String.valueOf(confidence))
+                .missingFields(intent.getMissingFields())
                 .timestamp(LocalDateTime.now().toString())
-                .build());
-
-        List<String> followUps = parser.checkMandatoryFieldsAndGenerateQuestions(ctx.intent);
-        if (followUps.isEmpty()) return;
-
-        StringBuilder body = new StringBuilder("I need a bit more information to help you find the perfect products. ");
-        if (followUps.size() == 1) {
-            body.append(followUps.get(0));
-        } else {
-            body.append("Here are a few questions:\n");
-            for (int i = 0; i < followUps.size(); i++) {
-                body.append(i + 1).append(". ").append(followUps.get(i)).append("\n");
-            }
-        }
-        ctx.response = ProductSearchResponse.builder()
-                .success(true)
-                .message(ProductSearchConstants.FOLLOW_UP_QUESTIONS_MESSAGE)
-                .response(body.toString())
-                .conversationId(ctx.sessionId)
-                .products(new ArrayList<>())
-                .steps(ctx.stepsBuilder.build())
                 .build();
+
+        List<String> followUps = parser.checkMandatoryFieldsAndGenerateQuestions(intent);
+        if (!followUps.isEmpty()) {
+            StringBuilder body = new StringBuilder("I need a bit more information to help you find the perfect products. ");
+            if (followUps.size() == 1) {
+                body.append(followUps.get(0));
+            } else {
+                body.append("Here are a few questions:\n");
+                for (int i = 0; i < followUps.size(); i++) {
+                    body.append(i + 1).append(". ").append(followUps.get(i)).append("\n");
+                }
+            }
+            ProductSearchResponse followUpResponse = ProductSearchResponse.builder()
+                    .success(true)
+                    .message(ProductSearchConstants.FOLLOW_UP_QUESTIONS_MESSAGE)
+                    .response(body.toString())
+                    .conversationId(sessionId)
+                    .products(new ArrayList<>())
+                    .steps(ProductSearchSteps.builder().intentParser(step).build())
+                    .build();
+            return new IntentResult(intent, rawJson, confidence, step, followUpResponse);
+        }
+
+        return new IntentResult(intent, rawJson, confidence, step, null);
     }
 
     public void clear(String sessionId) {

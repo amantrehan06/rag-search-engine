@@ -34,26 +34,26 @@ public class HybridSearchStage {
     @Qualifier("searchExpansionExecutor")
     private final Executor expansionExecutor;
 
-    public void run(SearchContext ctx) {
-        if (ctx.resolvedCategoryId == null) {
-            ctx.stepsBuilder.productSearch(ProductSearchSteps.ProductSearchStep.builder()
+    public SearchResult run(String resolvedCategoryId, ProductSearchIntent intent,
+                            List<String> queryVariations, String combinedQuery) {
+        if (resolvedCategoryId == null) {
+            ProductSearchSteps.ProductSearchStep step = ProductSearchSteps.ProductSearchStep.builder()
                     .metadataFilter(new HashMap<>())
                     .embeddingSearchQuery(ProductSearchConstants.NO_SEARCH_QUERY)
                     .resultsCount(0)
                     .searchMethod(ProductSearchConstants.NO_SEARCH_METHOD)
                     .timestamp(LocalDateTime.now().toString())
-                    .build());
-            return;
+                    .build();
+            return new SearchResult(List.of(), List.of(), step);
         }
 
-        Map<String, Object> filter = buildMetadataFilter(ctx.intent);
-        List<String> queries = ctx.queryVariations;
-        String traceQuery = ctx.combinedQuery;
+        Map<String, Object> filter = buildMetadataFilter(resolvedCategoryId, intent);
 
-        int count = tracer.traceProductSearch(traceQuery, () -> {
+        List<PineconeIndex.Match>[] candidatesRef = new List[1];
+        int count = tracer.traceProductSearch(combinedQuery, () -> {
             // Each variation hits Pinecone independently and returns its own ranked list of matches.
             // We need per-query rankings (not a flat union) so RRF can score by per-query rank.
-            List<List<PineconeIndex.Match>> perQuery = runSearches(queries, filter);
+            List<List<PineconeIndex.Match>> perQuery = runSearches(queryVariations, filter);
 
             // RRF merges the N ranked lists into one consensus-ordered list. The product the
             // reranker sees first is the one with the strongest cross-variation agreement, not
@@ -64,29 +64,33 @@ public class HybridSearchStage {
             Map<String, Long> occurrences = perQuery.stream()
                     .flatMap(List::stream)
                     .collect(Collectors.groupingBy(PineconeIndex.Match::id, Collectors.counting()));
-            int inAll      = (int) occurrences.values().stream().filter(c -> c == queries.size()).count();
-            int inMajority = (int) occurrences.values().stream().filter(c -> c >  queries.size() / 2).count();
+            int inAll      = (int) occurrences.values().stream().filter(c -> c == queryVariations.size()).count();
+            int inMajority = (int) occurrences.values().stream().filter(c -> c >  queryVariations.size() / 2).count();
 
             Span span = Span.current();
-            span.setAttribute("search.query_variations",             (long) queries.size());
+            span.setAttribute("search.query_variations",             (long) queryVariations.size());
             span.setAttribute("search.candidates_before_dedup",      (long) beforeDedup);
             span.setAttribute("search.candidates_after_dedup",       (long) fused.size());
             span.setAttribute("search.fusion_method",                "RRF");
             span.setAttribute("search.candidates_in_all_variations", (long) inAll);
             span.setAttribute("search.candidates_in_majority",       (long) inMajority);
 
-            ctx.candidates = fused;
-            return ctx.candidates.size();
+            candidatesRef[0] = fused;
+            return fused.size();
         });
-        ctx.products = toProducts(ctx.candidates);
 
-        ctx.stepsBuilder.productSearch(ProductSearchSteps.ProductSearchStep.builder()
+        List<PineconeIndex.Match> candidates = candidatesRef[0];
+        List<ProductSearchResponse.Product> products = toProducts(candidates);
+
+        ProductSearchSteps.ProductSearchStep step = ProductSearchSteps.ProductSearchStep.builder()
                 .metadataFilter(filter)
-                .embeddingSearchQuery(traceQuery)
+                .embeddingSearchQuery(combinedQuery)
                 .resultsCount(count)
                 .searchMethod(ProductSearchConstants.HYBRID_SEARCH_METHOD)
                 .timestamp(LocalDateTime.now().toString())
-                .build());
+                .build();
+
+        return new SearchResult(candidates, products, step);
     }
 
     private List<List<PineconeIndex.Match>> runSearches(List<String> queries, Map<String, Object> filter) {
@@ -135,14 +139,12 @@ public class HybridSearchStage {
                 .toList();
     }
 
-    private static Map<String, Object> buildMetadataFilter(ProductSearchIntent intent) {
+    private static Map<String, Object> buildMetadataFilter(String resolvedCategoryId, ProductSearchIntent intent) {
         Map<String, Object> filter = new HashMap<>();
         Map<String, Object> price = new HashMap<>();
 
-        if (intent.getCategoryId() != null) {
-            filter.put(ProductSearchConstants.CATEGORY_FIELD,
-                    Map.of(ProductSearchConstants.EQUALS_OPERATOR, intent.getCategoryId()));
-        }
+        filter.put(ProductSearchConstants.CATEGORY_FIELD,
+                Map.of(ProductSearchConstants.EQUALS_OPERATOR, resolvedCategoryId));
 
         double min = intent.getMinPrice() != null ? intent.getMinPrice().doubleValue() : ProductSearchConstants.DEFAULT_MIN_PRICE;
         double max = intent.getMaxPrice() != null ? intent.getMaxPrice().doubleValue() : ProductSearchConstants.DEFAULT_MAX_PRICE;

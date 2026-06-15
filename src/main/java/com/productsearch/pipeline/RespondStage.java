@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.productsearch.constants.ProductSearchConstants;
 import com.productsearch.evaluation.ProductJudgeService;
 import com.productsearch.infra.SessionManager;
+import com.productsearch.model.ProductSearchIntent;
 import com.productsearch.model.ProductSearchResponse;
 import com.productsearch.model.ProductSearchSteps;
-import com.productsearch.tracing.ProductPipelineTracer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -22,42 +22,30 @@ public class RespondStage {
     private static final ObjectMapper JSON = new ObjectMapper();
 
     private final SessionManager sessionManager;
-    private final IntentParseStage intentParseStage;
     private final ProductJudgeService judge;
-    private final ProductPipelineTracer tracer;
 
-    public void run(SearchContext ctx) {
-        ProductSearchSteps steps = ctx.stepsBuilder.build();
+    public ProductSearchResponse run(String sessionId, String originalMessage, ProductSearchIntent intent,
+                                     List<ProductSearchResponse.Product> rankedResults,
+                                     ProductSearchSteps steps, String traceId) {
+        if (!rankedResults.isEmpty()) {
+            sessionManager.clearSession(sessionId);
+            judge.evaluateAndSubmit(traceId, originalMessage, intent, rankedResults);
 
-        if (!ctx.rankedResults.isEmpty()) {
-            sessionManager.clearSession(ctx.sessionId);
-            intentParseStage.clear(ctx.sessionId);
-
-            String traceId = ctx.rootSpan.getSpanContext().getTraceId();
-            tracer.finishRootSpan(ctx.rootSpan, ctx.rootScope,
-                    "Found " + ctx.rankedResults.size() + " product(s) in " + ctx.rankedResults.get(0).getCategory());
-            ctx.rootSpan = null;
-
-            judge.evaluateAndSubmit(traceId, ctx.request.getMessage(), ctx.intent, ctx.rankedResults);
-
-            ctx.response = ProductSearchResponse.builder()
+            return ProductSearchResponse.builder()
                     .success(true)
                     .message(ProductSearchConstants.PRODUCT_SEARCH_SUCCESS_MESSAGE)
-                    .response(foundText(ctx.rankedResults, steps))
-                    .conversationId(ctx.sessionId)
-                    .products(ctx.rankedResults)
+                    .response(foundText(rankedResults, steps))
+                    .conversationId(sessionId)
+                    .products(rankedResults)
                     .steps(steps)
                     .build();
-            return;
         }
 
-        tracer.finishRootSpan(ctx.rootSpan, ctx.rootScope, "No products found");
-        ctx.rootSpan = null;
-        ctx.response = ProductSearchResponse.builder()
+        return ProductSearchResponse.builder()
                 .success(true)
                 .message(ProductSearchConstants.NO_PRODUCTS_MESSAGE)
                 .response(emptyText(steps))
-                .conversationId(ctx.sessionId)
+                .conversationId(sessionId)
                 .products(new ArrayList<>())
                 .steps(steps)
                 .build();

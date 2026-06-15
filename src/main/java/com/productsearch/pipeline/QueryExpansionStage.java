@@ -49,13 +49,13 @@ public class QueryExpansionStage {
     @Value("${search.query_variations:3}")
     private int variationCount;
 
-    public void run(SearchContext ctx) {
+    public ExpansionResult run(String combinedQuery) {
         if (variationCount <= 1) {
-            ctx.queryVariations = List.of(ctx.combinedQuery);
-            return;
+            return new ExpansionResult(List.of(combinedQuery));
         }
-        ctx.queryVariations = tracer.traceQueryExpansion(ctx.combinedQuery,
-                () -> generateVariations(ctx.combinedQuery, variationCount)).result();
+        List<String> variations = tracer.traceQueryExpansion(combinedQuery,
+                () -> generateVariations(combinedQuery, variationCount)).result();
+        return new ExpansionResult(variations);
     }
 
     private LLMCallResult<List<String>> generateVariations(String query, int n) {

@@ -1,5 +1,6 @@
 package com.productsearch.pipeline;
 
+import com.productsearch.model.ProductSearchResponse;
 import com.productsearch.model.RerankResult;
 import com.productsearch.service.ProductRerankerService;
 import com.productsearch.tracing.ProductPipelineTracer;
@@ -19,14 +20,10 @@ public class RerankStage {
     private final ProductRerankerService reranker;
     private final ProductPipelineTracer tracer;
 
-    public void run(SearchContext ctx) {
-        if (ctx.products.isEmpty()) {
-            ctx.rerankResult = RerankResult.empty();
-            ctx.rankedResults = List.of();
-            return;
+    public RerankResult run(String combinedQuery, List<ProductSearchResponse.Product> products) {
+        if (products.isEmpty()) {
+            return RerankResult.empty();
         }
-        ctx.rerankResult = tracer.traceReranker(
-                () -> reranker.rerankWithUsage(ctx.combinedQuery, ctx.products, TOP_N));
-        ctx.rankedResults = ctx.rerankResult.products();
+        return tracer.traceReranker(() -> reranker.rerankWithUsage(combinedQuery, products, TOP_N));
     }
 }
