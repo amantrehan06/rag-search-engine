@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RAG Search Engine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:          #F1F5F9;
+    --surface:     #FFFFFF;
+    --surface-2:   #F8FAFC;
+    --border:      #E2E8F0;
+    --border-2:    #CBD5E1;
+    --text:        #0F172A;
+    --text-dim:    #475569;
+    --text-mute:   #94A3B8;
+    --blue:        #2563EB;
+    --blue-dark:   #1D4ED8;
+    --blue-dim:    #3B82F6;
+    --blue-bg:     #EFF6FF;
+    --blue-border: #BFDBFE;
+    --green:       #059669;
+    --green-bg:    #ECFDF5;
+    --green-border:#A7F3D0;
+    --amber:       #D97706;
+    --amber-bg:    #FFFBEB;
+    --amber-border:#FDE68A;
+    --red:         #DC2626;
+    --red-bg:      #FEF2F2;
+    --red-border:  #FECACA;
+    --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 9px; }
+
+  /* ─── HEADER ─── */
+  .header {
+    height: 58px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .logo-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+  .logo-mark {
+    width: 34px; height: 34px;
+    border-radius: 9px;
+    background: var(--blue);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.3);
+  }
+  .logo-mark svg { display: block; }
+  .logo-text {
+    font-weight: 700;
+    font-size: 15.5px;
+    letter-spacing: -0.03em;
+    color: var(--text);
+  }
+  .logo-badge {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--blue);
+    background: var(--blue-bg);
+    border: 1px solid var(--blue-border);
+    padding: 2px 7px;
+    border-radius: 20px;
+  }
+  .header-spacer { flex: 1; }
+  .nav-links { display: flex; align-items: center; gap: 4px; }
+  .nav-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 7px;
+    transition: all 0.15s;
+  }
+  .nav-link:hover { color: var(--text); background: var(--bg); }
+  .nav-link.primary {
+    color: var(--blue);
+    background: var(--blue-bg);
+    border: 1px solid var(--blue-border);
+  }
+  .nav-link.primary:hover { background: #DBEAFE; }
+
+  /* ─── LAYOUT ─── */
+  .app {
+    display: grid;
+    grid-template-columns: 300px 1fr 1fr;
+    height: calc(100vh - 58px);
+  }
+  .panel {
+    overflow-y: auto;
+    padding: 24px;
+    border-right: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .panel:last-child { border-right: 0; background: var(--bg); }
+  .panel-mid { background: var(--surface); }
+
+  .section-label {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-mute);
+    margin-bottom: 14px;
+  }
+
+  /* ─── LEFT — Search ─── */
+  .search-box { position: relative; margin-bottom: 10px; }
+  .search-textarea {
+    width: 100%;
+    min-height: 120px;
+    background: var(--surface);
+    border: 1.5px solid var(--border-2);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 13.5px;
+    line-height: 1.65;
+    padding: 13px 14px 38px;
+    resize: vertical;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+  .search-textarea::placeholder { color: var(--text-mute); }
+  .search-textarea:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+  }
+  .hint-tag {
+    position: absolute;
+    bottom: 10px; right: 10px;
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-mute);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 6px;
+    pointer-events: none;
+  }
+
+  .run-btn {
+    width: 100%;
+    padding: 11px;
+    background: var(--blue);
+    border: 0;
+    border-radius: 9px;
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    letter-spacing: -0.01em;
+    transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.28);
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .run-btn:hover:not(:disabled) { background: var(--blue-dark); box-shadow: 0 4px 14px rgba(37,99,235,0.35); transform: translateY(-1px); }
+  .run-btn:active:not(:disabled) { transform: translateY(0); }
+  .run-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+  .run-btn .btn-spinner {
+    width: 14px; height: 14px;
+    border: 2px solid rgba(255,255,255,0.35);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.65s linear infinite;
+    display: none;
+  }
+  .run-btn.loading .btn-spinner { display: block; }
+  .run-btn.loading .btn-label { opacity: 0.8; }
+
+  .sep { border: 0; border-top: 1px solid var(--border); margin: 20px 0; }
+
+  /* ─── EXAMPLE CHIPS ─── */
+  .chips { display: flex; flex-direction: column; gap: 5px; }
+  .chip {
+    width: 100%;
+    text-align: left;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 11px;
+    color: var(--text-dim);
+    font-family: 'Inter', sans-serif;
+    font-size: 12.5px;
+    line-height: 1.45;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex; gap: 8px; align-items: flex-start;
+  }
+  .chip:hover {
+    background: var(--blue-bg);
+    border-color: var(--blue-border);
+    color: var(--text);
+  }
+  .chip .arrow {
+    color: var(--blue);
+    margin-top: 1px; flex-shrink: 0; font-size: 13px;
+    opacity: 0.8;
+  }
+  .chip.adv-chip { border-style: dashed; }
+  .chip.adv-chip .arrow { color: var(--amber); }
+  .chip.adv-chip:hover { background: var(--amber-bg); border-color: var(--amber-border); }
+
+  /* ─── MIDDLE — Pipeline ─── */
+  .pipeline { position: relative; padding-left: 0; }
+  .pipeline::before {
+    content: '';
+    position: absolute;
+    left: 19px;
+    top: 42px;
+    bottom: 34px;
+    width: 2px;
+    background: var(--border);
+    z-index: 0;
+  }
+
+  .stage-item {
+    display: flex;
+    gap: 14px;
+    padding-bottom: 20px;
+    position: relative;
+    z-index: 1;
+  }
+  .stage-item:last-child { padding-bottom: 0; }
+
+  .s-dot {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 2px solid var(--border-2);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 13px;
+    color: var(--text-mute);
+    font-family: var(--mono);
+    transition: all 0.25s ease;
+    flex-shrink: 0;
+    position: relative; z-index: 2;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .stage-item.active .s-dot {
+    border-color: var(--blue);
+    color: var(--blue);
+    background: var(--blue-bg);
+    box-shadow: 0 0 0 4px rgba(37,99,235,0.12);
+  }
+  .stage-item.done .s-dot {
+    background: var(--green); border-color: var(--green);
+    color: #fff; font-size: 15px;
+    box-shadow: 0 0 0 4px var(--green-bg);
+  }
+  .stage-item.skipped .s-dot {
+    background: var(--surface-2);
+    border-color: var(--border);
+    color: var(--text-mute);
+  }
+  .stage-item.errored .s-dot {
+    background: var(--red); border-color: var(--red);
+    color: #fff; font-size: 15px;
+  }
+
+  .s-body { flex: 1; padding-top: 7px; min-width: 0; }
+  .s-label {
+    font-weight: 600; font-size: 13px; color: var(--text);
+    opacity: 0.35; transition: opacity 0.25s;
+    display: flex; align-items: center; gap: 7px;
+    margin-bottom: 3px;
+  }
+  .stage-item.active .s-label,
+  .stage-item.done   .s-label,
+  .stage-item.skipped .s-label,
+  .stage-item.errored .s-label { opacity: 1; }
+
+  .s-out {
+    font-family: var(--mono); font-size: 11px;
+    color: var(--text-mute); min-height: 16px;
+    transition: color 0.2s;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .stage-item.active  .s-out { color: var(--blue); }
+  .stage-item.done    .s-out { color: var(--green); }
+  .stage-item.skipped .s-out { color: var(--text-mute); }
+  .stage-item.errored .s-out { color: var(--red); }
+
+  .s-detail {
+    margin-top: 8px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 9px 11px;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--text-dim);
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-all;
+    max-height: 130px;
+    overflow-y: auto;
+    display: none;
+  }
+  .s-detail.show { display: block; }
+
+  /* route tags */
+  .rtag {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-family: var(--mono); font-size: 10.5px; font-weight: 500;
+    padding: 2px 8px; border-radius: 4px; border: 1px solid;
+  }
+  .rtag-direct   { color: var(--green);  border-color: var(--green-border);  background: var(--green-bg); }
+  .rtag-semantic { color: var(--blue);   border-color: var(--blue-border);   background: var(--blue-bg); }
+  .rtag-skip     { color: var(--text-mute); border-color: var(--border); background: var(--surface-2); }
+
+  /* spinners */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .mini-spin {
+    width: 14px; height: 14px;
+    border: 2px solid var(--blue-border);
+    border-top-color: var(--blue);
+    border-radius: 50%;
+    animation: spin 0.65s linear infinite;
+    display: inline-block;
+  }
+
+  /* ─── Pipeline footer ─── */
+  .pipe-footer {
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+  }
+  .timing-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .timing-lbl { font-size: 13px; color: var(--text-dim); font-weight: 500; }
+  .timing-val { font-family: var(--mono); font-size: 13px; color: var(--text); font-weight: 600; }
+
+  .stag {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-family: var(--mono); font-size: 11px; font-weight: 500;
+    padding: 3px 9px; border-radius: 20px; border: 1px solid;
+  }
+  .stag-idle { color: var(--text-mute); border-color: var(--border);        background: var(--surface-2); }
+  .stag-run  { color: var(--blue);      border-color: var(--blue-border);   background: var(--blue-bg); }
+  .stag-ok   { color: var(--green);     border-color: var(--green-border);  background: var(--green-bg); }
+  .stag-err  { color: var(--red);       border-color: var(--red-border);    background: var(--red-bg); }
+
+  .raw-toggle-btn {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 13px;
+    display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer;
+    color: var(--text-dim);
+    font-family: 'Inter', sans-serif;
+    font-size: 12.5px; font-weight: 500;
+    transition: all 0.15s;
+  }
+  .raw-toggle-btn:hover { background: var(--surface-2); border-color: var(--border-2); color: var(--text); }
+  .chevron { display: inline-block; transition: transform 0.2s; font-size: 10px; }
+  .raw-toggle-btn.open .chevron { transform: rotate(180deg); }
+
+  .raw-pre {
+    display: none;
+    margin-top: 8px;
+    background: #1E293B;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 13px;
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1.65;
+    color: #94A3B8;
+    overflow: auto;
+    max-height: 260px;
+    white-space: pre;
+  }
+  .raw-pre.show { display: block; }
+
+  /* JSON colours (on dark code bg) */
+  .jk   { color: #7DD3FC; }
+  .js   { color: #86EFAC; }
+  .jn   { color: #FCA5A5; }
+  .jb   { color: #C084FC; }
+  .jnull{ color: #64748B; }
+
+  /* ─── RIGHT — Results ─── */
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .empty-state {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 72px 20px;
+    gap: 10px; text-align: center;
+  }
+  .empty-icon { font-size: 40px; line-height: 1; margin-bottom: 4px; opacity: 0.2; }
+  .empty-title { font-size: 15px; font-weight: 600; color: var(--text-dim); }
+  .empty-sub { font-size: 13px; color: var(--text-mute); line-height: 1.55; max-width: 260px; }
+
+  .result-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .result-count { font-size: 12.5px; color: var(--text-mute); }
+  .result-count strong { color: var(--text-dim); font-weight: 600; }
+
+  /* Product card */
+  .product-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-bottom: 10px;
+    transition: border-color 0.15s, box-shadow 0.2s, transform 0.15s;
+    animation: cardIn 0.28s ease both;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  .product-card:hover {
+    border-color: var(--blue-border);
+    box-shadow: 0 4px 20px rgba(37,99,235,0.1);
+    transform: translateY(-1px);
+  }
+  /* Left accent stripe by stock status / tier */
+  .product-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0; width: 3px;
+    border-radius: 12px 0 0 12px;
+  }
+  .product-card.in-stock::before    { background: var(--blue); }
+  .product-card.out-of-stock::before { background: var(--border-2); }
+
+  .card-top {
+    display: flex; align-items: flex-start;
+    gap: 10px; margin-bottom: 10px;
+  }
+  .rank {
+    width: 26px; height: 26px; flex-shrink: 0;
+    background: var(--blue-bg);
+    border: 1px solid var(--blue-border);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 11px; font-weight: 700;
+    color: var(--blue);
+    margin-top: 1px;
+  }
+  .card-main { flex: 1; min-width: 0; }
+  .card-name {
+    font-weight: 600; font-size: 14px; line-height: 1.35;
+    color: var(--text); margin-bottom: 3px;
+  }
+  .card-variant {
+    font-size: 12px; color: var(--text-mute);
+    font-weight: 500;
+  }
+  .card-price-col { text-align: right; flex-shrink: 0; }
+  .card-price {
+    font-family: var(--mono);
+    font-weight: 700; font-size: 17px;
+    color: var(--text); display: block;
+  }
+  .card-rating {
+    font-size: 11.5px; color: var(--amber);
+    font-weight: 600; margin-top: 1px;
+  }
+
+  .card-meta {
+    display: flex; gap: 5px; flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+  .meta-tag {
+    font-size: 11.5px; font-weight: 500;
+    padding: 3px 9px; border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text-dim);
+  }
+  .meta-tag.cat { color: var(--blue); border-color: var(--blue-border); background: var(--blue-bg); }
+
+  .card-desc {
+    font-size: 12.5px; color: var(--text-dim);
+    line-height: 1.55; margin-bottom: 12px;
+  }
+
+  .card-features { display: flex; gap: 6px; flex-wrap: wrap; }
+  .feat {
+    font-size: 11px; font-weight: 500;
+    padding: 3px 9px; border-radius: 20px;
+    border: 1px solid var(--border);
+    color: var(--text-mute); background: transparent;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .feat.on {
+    color: var(--green);
+    border-color: var(--green-border);
+    background: var(--green-bg);
+  }
+  .feat.out-stock {
+    color: var(--red);
+    border-color: var(--red-border);
+    background: var(--red-bg);
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 1180px) {
+    .app { grid-template-columns: 270px 1fr 1fr; }
+  }
+  @media (max-width: 860px) {
+    .app { grid-template-columns: 1fr; height: auto; }
+    .panel { height: auto; max-height: 80vh; border-right: 0; border-bottom: 1px solid var(--border); }
+    .pipeline::before { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ─────────────────── HEADER ─────────────────── -->
+<header class="header">
+  <a class="logo-wrap" href="/">
+    <div class="logo-mark">
+      <!-- search icon -->
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="7"/>
+        <line x1="16.5" y1="16.5" x2="22" y2="22"/>
+      </svg>
+    </div>
+    <span class="logo-text">RAG Search Engine</span>
+  </a>
+  <span class="logo-badge">Beta</span>
+
+  <div class="header-spacer"></div>
+
+  <nav class="nav-links">
+    <a class="nav-link primary" href="https://github.com/amantrehan06/rag-search-engine" target="_blank" rel="noopener">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38
+                 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13
+                 -.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66
+                 .07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15
+                 -.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.65 7.65 0 012 0c1.53-1.04
+                 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87
+                 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46
+                 .55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+      </svg>
+      GitHub
+    </a>
+  </nav>
+</header>
+
+<div class="app">
+
+  <!-- ═══════════════ LEFT — SEARCH ═══════════════ -->
+  <section class="panel">
+    <p class="section-label">Search</p>
+
+    <div class="search-box">
+      <textarea id="query" class="search-textarea"
+        placeholder="e.g. Noise-cancelling headphones under $350 with free shipping"
+        rows="5"></textarea>
+      <span class="hint-tag">⌘ ↵</span>
+    </div>
+
+    <button id="searchBtn" class="run-btn">
+      <span class="btn-spinner"></span>
+      <span class="btn-label">Search Products</span>
+    </button>
+
+    <hr class="sep" />
+
+    <p class="section-label">Try these</p>
+    <div class="chips">
+      <button class="chip"><span class="arrow">›</span><span class="chip-text">Noise-cancelling headphones under $350 with free shipping</span></button>
+      <button class="chip"><span class="arrow">›</span><span class="chip-text">Lightweight laptop for daily work under $1500</span></button>
+      <button class="chip"><span class="arrow">›</span><span class="chip-text">Running shoes for marathon training with warranty</span></button>
+      <button class="chip"><span class="arrow">›</span><span class="chip-text">Home office chair comfortable for long hours</span></button>
+      <button class="chip"><span class="arrow">›</span><span class="chip-text">GPS fitness watch with heart rate tracking</span></button>
+      <button class="chip"><span class="arrow">›</span><span class="chip-text">Best wireless earbuds for commuting under $200</span></button>
+      <button class="chip adv-chip"><span class="arrow">›</span><span class="chip-text">Vintage typewriters from the 1950s</span></button>
+    </div>
+  </section>
+
+  <!-- ═══════════════ MIDDLE — PIPELINE ═══════════════ -->
+  <section class="panel panel-mid">
+    <p class="section-label">Pipeline trace</p>
+
+    <div class="pipeline">
+
+      <div class="stage-item" id="si-intent">
+        <div class="s-dot" id="dot-intent">1</div>
+        <div class="s-body">
+          <div class="s-label">Intent parsing</div>
+          <div class="s-out" id="out-intent">—</div>
+          <div class="s-detail" id="detail-intent"></div>
+        </div>
+      </div>
+
+      <div class="stage-item" id="si-category">
+        <div class="s-dot" id="dot-category">2</div>
+        <div class="s-body">
+          <div class="s-label">Category routing</div>
+          <div class="s-out" id="out-category">—</div>
+          <div class="s-detail" id="detail-category"></div>
+        </div>
+      </div>
+
+      <div class="stage-item" id="si-hybrid">
+        <div class="s-dot" id="dot-hybrid">3</div>
+        <div class="s-body">
+          <div class="s-label">Hybrid product search</div>
+          <div class="s-out" id="out-hybrid">—</div>
+          <div class="s-detail" id="detail-hybrid"></div>
+        </div>
+      </div>
+
+      <div class="stage-item" id="si-reranker">
+        <div class="s-dot" id="dot-reranker">4</div>
+        <div class="s-body">
+          <div class="s-label">LLM reranker</div>
+          <div class="s-out" id="out-reranker">—</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="pipe-footer">
+      <div class="timing-row">
+        <span class="timing-lbl">End-to-end latency</span>
+        <span class="timing-val" id="totalTime">
+          <span class="stag stag-idle">idle</span>
+        </span>
+      </div>
+
+      <button class="raw-toggle-btn" id="toggleRaw">
+        <span>Raw intent JSON</span>
+        <span class="chevron">▾</span>
+      </button>
+      <pre class="raw-pre" id="rawJson"></pre>
+    </div>
+  </section>
+
+  <!-- ═══════════════ RIGHT — RESULTS ═══════════════ -->
+  <section class="panel">
+    <p class="section-label">Results</p>
+    <div id="results">
+      <div class="empty-state">
+        <div class="empty-icon">🔍</div>
+        <p class="empty-title">Run a search to see results</p>
+        <p class="empty-sub">Type a natural language query and hit Search Products.</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  const $   = id => document.getElementById(id);
+  const esc = s => (s ?? '').toString()
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+
+  const NUMS = { intent: '1', category: '2', hybrid: '3', reranker: '4' };
+  const STGS = ['intent', 'category', 'hybrid', 'reranker'];
+
+  // ── JSON renderer ──────────────────────────────────
+  function renderJson(raw) {
+    if (!raw) return '';
+    let s;
+    try   { s = JSON.stringify(typeof raw === 'string' ? JSON.parse(raw) : raw, null, 2); }
+    catch { s = String(raw); }
+    s = s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    return s
+      .replace(/"([^"]*)"(\s*:)/g,       '<span class="jk">"$1"</span>$2')
+      .replace(/(\s*:\s*)"([^"]*)"/g,    '$1<span class="js">"$2"</span>')
+      .replace(/(\s*:\s*)(-?\d+\.?\d*)/g,'$1<span class="jn">$2</span>')
+      .replace(/(\s*:\s*)(true|false)/g,  '$1<span class="jb">$2</span>')
+      .replace(/(\s*:\s*)(null)/g,        '$1<span class="jnull">$2</span>');
+  }
+
+  // ── Stage state machine ────────────────────────────
+  function stageIdle(s) {
+    const el = $('si-' + s);
+    el.className = 'stage-item';
+    $('dot-' + s).textContent = NUMS[s];
+    $('out-' + s).textContent = '—';
+    const d = $('detail-' + s);
+    if (d) { d.textContent = ''; d.classList.remove('show'); }
+  }
+  function stageActive(s) {
+    $('si-' + s).className = 'stage-item active';
+    $('dot-' + s).innerHTML = '<span class="mini-spin"></span>';
+    $('out-' + s).textContent = 'processing…';
+  }
+  function stageDone(s, outHtml, detailText) {
+    $('si-' + s).className = 'stage-item done';
+    $('dot-' + s).textContent = '✓';
+    $('out-' + s).innerHTML   = outHtml || '';
+    if (detailText) {
+      const d = $('detail-' + s);
+      if (d) { d.textContent = detailText; d.classList.add('show'); }
+    }
+  }
+  function stageSkip(s, why) {
+    $('si-' + s).className = 'stage-item skipped';
+    $('dot-' + s).textContent = '–';
+    $('out-' + s).textContent  = why || 'skipped';
+  }
+  function stageError(s, why) {
+    $('si-' + s).className = 'stage-item errored';
+    $('dot-' + s).textContent = '✗';
+    $('out-' + s).textContent  = why || 'error';
+  }
+
+  function reset() {
+    STGS.forEach(stageIdle);
+    $('totalTime').innerHTML = '<span class="stag stag-run">running…</span>';
+    $('rawJson').innerHTML   = '';
+    $('rawJson').classList.remove('show');
+    $('toggleRaw').classList.remove('open');
+  }
+
+  // ── Star rating helper ─────────────────────────────
+  function stars(rating) {
+    if (!rating) return '';
+    const full  = Math.floor(rating);
+    const half  = rating - full >= 0.5 ? 1 : 0;
+    const empty = 5 - full - half;
+    return '★'.repeat(full) + (half ? '½' : '') + '☆'.repeat(empty) + ` ${Number(rating).toFixed(1)}`;
+  }
+
+  // ── Result cards ──────────────────────────────────
+  function renderResults(products) {
+    const root = $('results');
+    if (!products || products.length === 0) {
+      root.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">🚫</div>
+          <p class="empty-title">No products matched</p>
+          <p class="empty-sub">The system refused to hallucinate — expected behaviour for out-of-catalog queries.</p>
+        </div>`;
+      return;
+    }
+
+    const header = `
+      <div class="result-header">
+        <p class="section-label" style="margin-bottom:0">Products</p>
+        <span class="result-count"><strong>${products.length}</strong> result${products.length !== 1 ? 's' : ''}</span>
+      </div>`;
+
+    const cards = products.map((p, i) => {
+      const delay    = i * 50;
+      const inStock  = p.inStock !== false;
+      const stockCls = inStock ? 'in-stock' : 'out-of-stock';
+
+      const variantLabel = p.variantLabel || p.persona || '';
+      const modelName    = p.modelName || p.name || '';
+      const brandName    = p.brandName || '';
+      const category     = p.category  || '';
+      const rating       = p.rating;
+
+      const badges = [
+        { label: '✓ Free shipping', on: !!p.freeShipping },
+        { label: '✓ Warranty',      on: !!p.warrantyIncluded },
+        { label: '✓ Bundle deal',   on: !!p.bundleIncluded },
+      ]
+        .filter(b => b.on)
+        .map(b => `<span class="feat on">${b.label}</span>`)
+        .join('');
+
+      const outOfStockBadge = !inStock
+        ? `<span class="feat out-stock">Out of stock</span>`
+        : '';
+
+      return `
+        <div class="product-card ${stockCls}" style="animation-delay:${delay}ms">
+          <div class="card-top">
+            <div class="rank">${i + 1}</div>
+            <div class="card-main">
+              <div class="card-name">${esc(modelName)}</div>
+              ${variantLabel ? `<div class="card-variant">${esc(variantLabel)}</div>` : ''}
+            </div>
+            <div class="card-price-col">
+              <span class="card-price">$${Number(p.price || 0).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
+              ${rating ? `<div class="card-rating">${stars(rating)}</div>` : ''}
+            </div>
+          </div>
+
+          <div class="card-meta">
+            ${brandName ? `<span class="meta-tag">${esc(brandName)}</span>` : ''}
+            ${category  ? `<span class="meta-tag cat">${esc(category)}</span>` : ''}
+          </div>
+
+          ${p.description ? `<div class="card-desc">${esc(p.description)}</div>` : ''}
+
+          <div class="card-features">
+            ${badges}
+            ${outOfStockBadge}
+          </div>
+        </div>`;
+    }).join('');
+
+    root.innerHTML = header + cards;
+  }
+
+  // ── Main search ───────────────────────────────────
+  async function runSearch() {
+    const q = $('query').value.trim();
+    if (!q) { $('query').focus(); return; }
+
+    reset();
+    $('searchBtn').disabled = true;
+    $('searchBtn').classList.add('loading');
+    $('results').innerHTML = `
+      <div class="empty-state">
+        <span class="mini-spin" style="width:24px;height:24px;border-width:3px"></span>
+      </div>`;
+
+    stageActive('intent');
+
+    const t0 = performance.now();
+    let resp;
+    try {
+      const r = await fetch('/api/v1/product-search/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: q, conversationId: crypto.randomUUID() })
+      });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      resp = await r.json();
+    } catch (e) {
+      stageError('intent', e.message);
+      $('totalTime').innerHTML = '<span class="stag stag-err">error</span>';
+      $('results').innerHTML = `
+        <div class="empty-state">
+          <p class="empty-sub" style="color:var(--red)">${esc(e.message)}</p>
+        </div>`;
+      $('searchBtn').disabled = false;
+      $('searchBtn').classList.remove('loading');
+      return;
+    }
+    const totalMs = Math.round(performance.now() - t0);
+
+    const steps    = resp.steps || {};
+    const intent   = steps.intentParser   || {};
+    const category = steps.categorySearch || {};
+    const product  = steps.productSearch  || {};
+
+    // Stage 1 — Intent
+    await wait(100);
+    const conf = intent.confidence ? ` · conf ${Number(intent.confidence).toFixed(2)}` : '';
+    stageDone('intent', `parsed${esc(conf)}`);
+    $('rawJson').innerHTML = renderJson(intent.llmResponse);
+
+    // Stage 2 — Category
+    await wait(150);
+    const method = (category.searchMethod || '').toLowerCase();
+    const catId  = category.categoryId || '';
+    if (method.includes('direct') && catId) {
+      stageDone('category', `<span class="rtag rtag-direct">direct → ${esc(catId)}</span>`);
+    } else if (!catId || catId === 'none' || method.includes('no search')) {
+      stageSkip('category', 'no category resolved');
+    } else {
+      const top = (category.topResults || []).slice(0, 3).join(', ');
+      stageDone('category',
+        `<span class="rtag rtag-semantic">semantic → ${esc(catId)}</span>`,
+        top ? 'top: ' + top : null);
+    }
+
+    // Stage 3 — Hybrid
+    await wait(150);
+    const n = product.resultsCount ?? 0;
+    if (!catId || catId === 'none') {
+      stageSkip('hybrid', 'no category — search skipped');
+    } else {
+      const filterStr = product.metadataFilter
+        ? JSON.stringify(product.metadataFilter, null, 2) : null;
+      stageDone('hybrid', `${n} candidate${n !== 1 ? 's' : ''} returned`, filterStr);
+    }
+
+    // Stage 4 — Reranker
+    await wait(150);
+    const finalN = (resp.products || []).length;
+    if (n === 0) {
+      stageSkip('reranker', 'no candidates to rank');
+    } else if (n <= 5) {
+      stageDone('reranker', `${finalN} result${finalN !== 1 ? 's' : ''} · skipped (≤ top-N)`);
+    } else {
+      stageDone('reranker', `${finalN} result${finalN !== 1 ? 's' : ''}`);
+    }
+
+    $('totalTime').innerHTML = `<span class="stag stag-ok">${totalMs} ms</span>`;
+
+    renderResults(resp.products || []);
+    $('searchBtn').disabled = false;
+    $('searchBtn').classList.remove('loading');
+  }
+
+  // ── Wire-up ───────────────────────────────────────
+  $('searchBtn').addEventListener('click', runSearch);
+
+  $('query').addEventListener('keydown', e => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      e.preventDefault(); runSearch();
+    }
+  });
+
+  $('toggleRaw').addEventListener('click', () => {
+    const shown = $('rawJson').classList.toggle('show');
+    $('toggleRaw').classList.toggle('open', shown);
+  });
+
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const label = chip.querySelector('.chip-text');
+      $('query').value = (label ? label.textContent : chip.textContent).trim();
+      $('query').focus();
+    });
+  });
+</script>
+</body>
+</html>

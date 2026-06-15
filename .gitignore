@@ -1,0 +1,20 @@
+target/
+*.class
+*.jar
+*.war
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+
+# Local env (never commit secrets)
+env.properties
+
+# Logs
+*.log
+logs/
+*.zip

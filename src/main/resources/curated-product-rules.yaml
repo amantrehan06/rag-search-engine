@@ -1,0 +1,1240 @@
+# ================================================================
+# curated-product-rules.yaml
+# SOURCE OF TRUTH for CatalogGenerationService
+#
+# Structure: 5 categories × ~50 products each = 250 products
+# 3 brands per category, mix of models and variants
+# Real products, real prices, real attributes
+#
+# Each product entry produces one record per variant label.
+# ================================================================
+
+categories:
+  - id: audio
+    name: Audio
+  - id: footwear
+    name: Footwear
+  - id: furniture
+    name: Furniture
+  - id: laptops
+    name: Laptops
+  - id: fitness
+    name: Fitness
+
+brands:
+  SONY:       { name: Sony,         category: audio }
+  BOSE:       { name: Bose,         category: audio }
+  JABRA:      { name: Jabra,        category: audio }
+  NIKE:       { name: Nike,         category: footwear }
+  ASICS:      { name: ASICS,        category: footwear }
+  NEWBALANCE: { name: New Balance,  category: footwear }
+  IKEA:       { name: IKEA,         category: furniture }
+  ARTICLE:    { name: Article,      category: furniture }
+  STRUCTUBE:  { name: Structube,    category: furniture }
+  APPLE:      { name: Apple,        category: laptops }
+  DELL:       { name: Dell,         category: laptops }
+  LENOVO:     { name: Lenovo,       category: laptops }
+  PELOTON:    { name: Peloton,      category: fitness }
+  GARMIN:     { name: Garmin,       category: fitness }
+  THERAGUN:   { name: Theragun,     category: fitness }
+
+products:
+
+  # ================================================================
+  # AUDIO — 50 products
+  # SONY: 18 | BOSE: 17 | JABRA: 15
+  # ================================================================
+
+  # --- SONY (18) ---
+  - productId: sony-wh1000xm5
+    category: audio
+    brandCode: SONY
+    modelName: Sony WH-1000XM5 Wireless Headphones
+    price: 289.99
+    freeShipping: true
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.8
+    variants: [Black, Midnight Blue, Silver]
+
+  - productId: sony-wh1000xm4
+    category: audio
+    brandCode: SONY
+    modelName: Sony WH-1000XM4 Wireless Headphones
+    price: 229.99
+    freeShipping: true
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.7
+    variants: [Black, Silver, Blue]
+
+  - productId: sony-wf1000xm5
+    category: audio
+    brandCode: SONY
+    modelName: Sony WF-1000XM5 True Wireless Earbuds
+    price: 199.99
+    freeShipping: true
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.6
+    variants: [Black, Platinum Silver]
+
+  - productId: sony-wf1000xm4
+    category: audio
+    brandCode: SONY
+    modelName: Sony WF-1000XM4 True Wireless Earbuds
+    price: 149.99
+    freeShipping: true
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.5
+    variants: [Black, Silver]
+
+  - productId: sony-whch720n
+    category: audio
+    brandCode: SONY
+    modelName: Sony WH-CH720N Lightweight Wireless
+    price: 99.99
+    freeShipping: false
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.3
+    variants: [Black, White, Blue]
+
+  - productId: sony-whch510
+    category: audio
+    brandCode: SONY
+    modelName: Sony WH-CH510 Wireless On-Ear
+    price: 49.99
+    freeShipping: false
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.1
+    variants: [Black, White, Blue, Pink]
+
+  - productId: sony-mdr7506
+    category: audio
+    brandCode: SONY
+    modelName: Sony MDR-7506 Professional Studio Headphones
+    price: 89.99
+    freeShipping: false
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.8
+    variants: [Black]
+
+  # --- BOSE (17) ---
+  - productId: bose-qc-ultra-headphones
+    category: audio
+    brandCode: BOSE
+    modelName: Bose QuietComfort Ultra Headphones
+    price: 379.99
+    freeShipping: true
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.8
+    variants: [Black, White Smoke]
+
+  - productId: bose-qc45
+    category: audio
+    brandCode: BOSE
+    modelName: Bose QuietComfort 45 Headphones
+    price: 249.99
+    freeShipping: true
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.6
+    variants: [Black, White]
+
+  - productId: bose-qc35ii
+    category: audio
+    brandCode: BOSE
+    modelName: Bose QuietComfort 35 II Wireless
+    price: 199.99
+    freeShipping: false
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.5
+    variants: [Black, Silver]
+
+  - productId: bose-qc-ultra-earbuds
+    category: audio
+    brandCode: BOSE
+    modelName: Bose QuietComfort Ultra Earbuds
+    price: 249.99
+    freeShipping: true
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.6
+    variants: [Black, White]
+
+  - productId: bose-qc-earbuds-ii
+    category: audio
+    brandCode: BOSE
+    modelName: Bose QuietComfort Earbuds II
+    price: 199.99
+    freeShipping: true
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.4
+    variants: [Black, Soapstone]
+
+  - productId: bose-sport-earbuds
+    category: audio
+    brandCode: BOSE
+    modelName: Bose Sport Earbuds
+    price: 129.99
+    freeShipping: false
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.3
+    variants: [Triple Black, Glacier White]
+
+  - productId: bose-soundlink-flex
+    category: audio
+    brandCode: BOSE
+    modelName: Bose SoundLink Flex Bluetooth Speaker
+    price: 119.99
+    freeShipping: false
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.5
+    variants: [Black, Stone Blue, Cypress Green]
+
+  - productId: bose-soundlink-max
+    category: audio
+    brandCode: BOSE
+    modelName: Bose SoundLink Max Portable Speaker
+    price: 399.99
+    freeShipping: true
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.7
+    variants: [Black, White]
+
+  # --- JABRA (15) ---
+  - productId: jabra-evolve2-85
+    category: audio
+    brandCode: JABRA
+    modelName: Jabra Evolve2 85 Wireless Headset
+    price: 379.99
+    freeShipping: true
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.6
+    variants: [Black, Beige]
+
+  - productId: jabra-evolve2-75
+    category: audio
+    brandCode: JABRA
+    modelName: Jabra Evolve2 75 Wireless Headset
+    price: 299.99
+    freeShipping: true
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.5
+    variants: [Black, Beige]
+
+  - productId: jabra-evolve2-65
+    category: audio
+    brandCode: JABRA
+    modelName: Jabra Evolve2 65 Wireless Headset
+    price: 219.99
+    freeShipping: true
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.4
+    variants: [Black, Titanium]
+
+  - productId: jabra-evolve2-55
+    category: audio
+    brandCode: JABRA
+    modelName: Jabra Evolve2 55 Wireless Headset
+    price: 249.99
+    freeShipping: true
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.3
+    variants: [Black, Beige]
+
+  - productId: jabra-elite-10
+    category: audio
+    brandCode: JABRA
+    modelName: Jabra Elite 10 True Wireless Earbuds
+    price: 179.99
+    freeShipping: true
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.5
+    variants: [Gloss Black, Cream, Cocoa]
+
+  - productId: jabra-elite-8-active
+    category: audio
+    brandCode: JABRA
+    modelName: Jabra Elite 8 Active Sport Earbuds
+    price: 149.99
+    freeShipping: true
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.4
+    variants: [Black, Dark Grey]
+
+  - productId: jabra-elite-4
+    category: audio
+    brandCode: JABRA
+    modelName: Jabra Elite 4 Active Earbuds
+    price: 89.99
+    freeShipping: false
+    warrantyIncluded: false
+    inStock: false   # OUT OF STOCK — eval case
+    rating: 4.2
+    variants: [Black, Navy]
+
+  # ================================================================
+  # FOOTWEAR — 50 products
+  # NIKE: 18 | ASICS: 17 | NEW BALANCE: 15
+  # ================================================================
+
+  # --- NIKE (18) ---
+  - productId: nike-vaporfly3
+    category: footwear
+    brandCode: NIKE
+    modelName: Nike Vaporfly 3 Carbon Racing Shoe
+    price: 259.99
+    freeShipping: true
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.8
+    variants: [White/Black, Volt/Black, Pink/White]
+
+  - productId: nike-alphafly3
+    category: footwear
+    brandCode: NIKE
+    modelName: Nike Alphafly 3 Marathon Racer
+    price: 299.99
+    freeShipping: true
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.9
+    variants: [Black/White, Volt/Black]
+
+  - productId: nike-pegasus41
+    category: footwear
+    brandCode: NIKE
+    modelName: Nike Pegasus 41 Daily Trainer
+    price: 139.99
+    freeShipping: true
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.5
+    variants: [Black/White, Blue/White, Grey/Orange, White/Red]
+
+  - productId: nike-invincible3
+    category: footwear
+    brandCode: NIKE
+    modelName: Nike Invincible 3 Max Cushion Trainer
+    price: 179.99
+    freeShipping: true
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.6
+    variants: [Black, White/Blue, Pink/White]
+
+  - productId: nike-structure25
+    category: footwear
+    brandCode: NIKE
+    modelName: Nike Structure 25 Stability Trainer
+    price: 134.99
+    freeShipping: true
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.4
+    variants: [Black/White, Blue/Silver]
+
+  - productId: nike-react-infinity4
+    category: footwear
+    brandCode: NIKE
+    modelName: Nike React Infinity Run 4 Injury Prevention
+    price: 159.99
+    freeShipping: true
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.5
+    variants: [Black/White, White/Grey]
+
+  - productId: nike-revolution7
+    category: footwear
+    brandCode: NIKE
+    modelName: Nike Revolution 7 Everyday Runner
+    price: 64.99
+    freeShipping: false
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.1
+    variants: [Black/White, White/Grey, Blue/Volt]
+
+  # --- ASICS (17) ---
+  - productId: asics-metaspeed-sky-paris
+    category: footwear
+    brandCode: ASICS
+    modelName: ASICS Metaspeed Sky Paris Carbon Racer
+    price: 249.99
+    freeShipping: true
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.7
+    variants: [White/Blue, Black/Gold, White/Orange]
+
+  - productId: asics-gel-nimbus26
+    category: footwear
+    brandCode: ASICS
+    modelName: ASICS Gel-Nimbus 26 Maximum Cushion
+    price: 164.99
+    freeShipping: true
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.6
+    variants: [Black/Graphite, White/Aquarium, Blue/White]
+
+  - productId: asics-gel-kayano30
+    category: footwear
+    brandCode: ASICS
+    modelName: ASICS Gel-Kayano 30 Stability Trainer
+    price: 159.99
+    freeShipping: true
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.5
+    variants: [Black/Black, Blue/White, White/Silver]
+
+  - productId: asics-gel-cumulus26
+    category: footwear
+    brandCode: ASICS
+    modelName: ASICS Gel-Cumulus 26 Versatile Trainer
+    price: 139.99
+    freeShipping: true
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.4
+    variants: [Black/White, Blue/Orange, Grey/Yellow]
+
+  - productId: asics-gt-2000-13
+    category: footwear
+    brandCode: ASICS
+    modelName: ASICS GT-2000 13 Support Trainer
+    price: 124.99
+    freeShipping: false
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.4
+    variants: [Black/White, Blue/White]
+
+  - productId: asics-gel-contend8
+    category: footwear
+    brandCode: ASICS
+    modelName: ASICS Gel-Contend 8 Entry Runner
+    price: 64.99
+    freeShipping: false
+    warrantyIncluded: false
+    inStock: false   # OUT OF STOCK — eval case
+    rating: 4.0
+    variants: [Black/White, Grey/Orange]
+
+  # --- NEW BALANCE (15) ---
+  - productId: nb-supercomp-elite-v4
+    category: footwear
+    brandCode: NEWBALANCE
+    modelName: New Balance FuelCell SuperComp Elite v4
+    price: 249.99
+    freeShipping: true
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.7
+    variants: [White/Black, Blue/Yellow, Black/Red]
+
+  - productId: nb-fresh-foam-1080v13
+    category: footwear
+    brandCode: NEWBALANCE
+    modelName: New Balance Fresh Foam X 1080v13
+    price: 164.99
+    freeShipping: true
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.6
+    variants: [Black/Thunder, White/Blue, Grey/Orange]
+
+  - productId: nb-860v14
+    category: footwear
+    brandCode: NEWBALANCE
+    modelName: New Balance 860v14 Stability Trainer
+    price: 129.99
+    freeShipping: true
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.4
+    variants: [Black/White, Grey/Blue, Navy/White]
+
+  - productId: nb-fresh-foam-880v14
+    category: footwear
+    brandCode: NEWBALANCE
+    modelName: New Balance Fresh Foam X 880v14 Daily Trainer
+    price: 139.99
+    freeShipping: true
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.5
+    variants: [Black/White, Blue/Orange]
+
+  - productId: nb-411v3
+    category: footwear
+    brandCode: NEWBALANCE
+    modelName: New Balance 411v3 Walking Shoe
+    price: 59.99
+    freeShipping: false
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.2
+    variants: [White/Navy, Black/White, Grey/White, Navy/Grey]
+
+  # ================================================================
+  # FURNITURE — 50 products
+  # IKEA: 18 | ARTICLE: 17 | STRUCTUBE: 15
+  # ================================================================
+
+  # --- IKEA (18) ---
+  - productId: ikea-landskrona-sofa
+    category: furniture
+    brandCode: IKEA
+    modelName: IKEA LANDSKRONA 3-Seat Leather Sofa
+    price: 1799.99
+    freeShipping: false
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.5
+    variants: [Grann White Leather, Grann Black Leather]
+
+  - productId: ikea-kivik-sofa
+    category: furniture
+    brandCode: IKEA
+    modelName: IKEA KIVIK 3-Seat Sofa
+    price: 799.99
+    freeShipping: false
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.3
+    variants: [Hillared Dark Blue, Hillared Beige, Tibbleby Beige/Grey]
+
+  - productId: ikea-markus-chair
+    category: furniture
+    brandCode: IKEA
+    modelName: IKEA MARKUS Ergonomic Office Chair
+    price: 229.99
+    freeShipping: false
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.6
+    variants: [Vissle Dark Grey, Vissle Black]
+
+  - productId: ikea-alefjall-chair
+    category: furniture
+    brandCode: IKEA
+    modelName: IKEA ALEFJÄLL Office Chair High Back
+    price: 349.99
+    freeShipping: false
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.4
+    variants: [Grann Black Leather, Grann White Leather]
+
+  - productId: ikea-strandmon-wingchair
+    category: furniture
+    brandCode: IKEA
+    modelName: IKEA STRANDMON Wing Chair
+    price: 549.99
+    freeShipping: false
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.4
+    variants: [Nordvalla Dark Grey, Skiftebo Yellow, Kelinge Grey-Turquoise]
+
+  - productId: ikea-poang-armchair
+    category: furniture
+    brandCode: IKEA
+    modelName: IKEA POÄNG Armchair
+    price: 129.99
+    freeShipping: false
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.3
+    variants: [Birch/Knisa Light Beige, Birch/Knisa Black]
+
+  - productId: ikea-bekant-desk
+    category: furniture
+    brandCode: IKEA
+    modelName: IKEA BEKANT Sit/Stand Desk
+    price: 489.99
+    freeShipping: false
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.2
+    variants: [White, Black-Brown]
+
+  - productId: ikea-kallax-shelf
+    category: furniture
+    brandCode: IKEA
+    modelName: IKEA KALLAX Shelf Unit 4x4
+    price: 189.99
+    freeShipping: false
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.5
+    variants: [White, Black-Brown, Oak Effect]
+
+  # --- ARTICLE (17) ---
+  - productId: article-sven-sofa
+    category: furniture
+    brandCode: ARTICLE
+    modelName: Article Sven 3-Seat Sofa
+    price: 1699.99
+    freeShipping: true
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.6
+    variants: [Charme Tan Leather, Vaasa Storm Fabric, Vaasa Bone Fabric]
+
+  - productId: article-ceni-sofa
+    category: furniture
+    brandCode: ARTICLE
+    modelName: Article Ceni 3-Seat Sofa
+    price: 1299.99
+    freeShipping: true
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.5
+    variants: [Boucle Ivory, Boucle Sage, Fabric Grey]
+
+  - productId: article-zander-desk
+    category: furniture
+    brandCode: ARTICLE
+    modelName: Article Zander Standing Desk
+    price: 699.99
+    freeShipping: true
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.5
+    variants: [White/White Legs, Walnut/Black Legs]
+
+  - productId: article-burrard-chair
+    category: furniture
+    brandCode: ARTICLE
+    modelName: Article Burrard Office Chair
+    price: 449.99
+    freeShipping: true
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.4
+    variants: [Black Mesh, Grey Mesh, White Mesh]
+
+  - productId: article-timber-bookshelf
+    category: furniture
+    brandCode: ARTICLE
+    modelName: Article Timber Tall Bookshelf
+    price: 349.99
+    freeShipping: true
+    warrantyIncluded: false
+    inStock: false   # OUT OF STOCK — eval case
+    rating: 4.3
+    variants: [Natural Oak, Black]
+
+  - productId: article-arca-coffee-table
+    category: furniture
+    brandCode: ARTICLE
+    modelName: Article Arca Coffee Table
+    price: 449.99
+    freeShipping: true
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.4
+    variants: [White Marble/Gold, Black Marble/Black]
+
+  - productId: article-nera-bed-frame
+    category: furniture
+    brandCode: ARTICLE
+    modelName: Article Nera Queen Bed Frame
+    price: 799.99
+    freeShipping: true
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.5
+    variants: [Charcoal Fabric, Light Grey Fabric]
+
+  # --- STRUCTUBE (15) ---
+  - productId: structube-felix-sofa
+    category: furniture
+    brandCode: STRUCTUBE
+    modelName: Structube FELIX 3-Seat Fabric Sofa
+    price: 1299.99
+    freeShipping: true
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.4
+    variants: [Light Grey, Charcoal, Camel]
+
+  - productId: structube-bruni-desk
+    category: furniture
+    brandCode: STRUCTUBE
+    modelName: Structube BRUNI Home Office Desk
+    price: 399.99
+    freeShipping: true
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.3
+    variants: [White, Walnut, Black]
+
+  - productId: structube-mika-chair
+    category: furniture
+    brandCode: STRUCTUBE
+    modelName: Structube MIKA Accent Chair
+    price: 449.99
+    freeShipping: true
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.2
+    variants: [Cream Boucle, Forest Green, Dusty Pink]
+
+  - productId: structube-oslo-shelf
+    category: furniture
+    brandCode: STRUCTUBE
+    modelName: Structube OSLO Open Shelving Unit
+    price: 299.99
+    freeShipping: false
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.1
+    variants: [White, Black Metal, Walnut]
+
+  - productId: structube-nova-coffee-table
+    category: furniture
+    brandCode: STRUCTUBE
+    modelName: Structube NOVA Marble Coffee Table
+    price: 549.99
+    freeShipping: true
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.3
+    variants: [White Marble, Black Marble]
+
+  # ================================================================
+  # LAPTOPS — 50 products
+  # APPLE: 18 | DELL: 17 | LENOVO: 15
+  # ================================================================
+
+  # --- APPLE (18) ---
+  - productId: apple-mbp-16-m4pro
+    category: laptops
+    brandCode: APPLE
+    modelName: Apple MacBook Pro 16-inch M4 Pro
+    price: 2499.99
+    freeShipping: true
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.9
+    variants: [Space Black, Silver]
+
+  - productId: apple-mbp-16-m4max
+    category: laptops
+    brandCode: APPLE
+    modelName: Apple MacBook Pro 16-inch M4 Max
+    price: 3499.99
+    freeShipping: true
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.9
+    variants: [Space Black, Silver]
+
+  - productId: apple-mbp-14-m4pro
+    category: laptops
+    brandCode: APPLE
+    modelName: Apple MacBook Pro 14-inch M4 Pro
+    price: 1999.99
+    freeShipping: true
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.8
+    variants: [Space Black, Silver]
+
+  - productId: apple-mbp-14-m4
+    category: laptops
+    brandCode: APPLE
+    modelName: Apple MacBook Pro 14-inch M4
+    price: 1599.99
+    freeShipping: true
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.8
+    variants: [Space Black, Silver]
+
+  - productId: apple-mba-15-m3
+    category: laptops
+    brandCode: APPLE
+    modelName: Apple MacBook Air 15-inch M3
+    price: 1299.99
+    freeShipping: true
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.7
+    variants: [Midnight, Starlight, Space Grey, Silver]
+
+  - productId: apple-mba-13-m3
+    category: laptops
+    brandCode: APPLE
+    modelName: Apple MacBook Air 13-inch M3
+    price: 1099.99
+    freeShipping: true
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.7
+    variants: [Midnight, Starlight, Space Grey]
+
+  # --- DELL (17) ---
+  - productId: dell-xps-15-oled
+    category: laptops
+    brandCode: DELL
+    modelName: Dell XPS 15 OLED Intel Core Ultra 9
+    price: 2299.99
+    freeShipping: true
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.6
+    variants: [Platinum Silver, Graphite, Arctic White]
+
+  - productId: dell-xps-13-plus
+    category: laptops
+    brandCode: DELL
+    modelName: Dell XPS 13 Plus Intel Core Ultra 7
+    price: 1399.99
+    freeShipping: true
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.5
+    variants: [Platinum Silver, Graphite, Rose Gold]
+
+  - productId: dell-xps-13
+    category: laptops
+    brandCode: DELL
+    modelName: Dell XPS 13 Intel Core Ultra 5
+    price: 999.99
+    freeShipping: true
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.4
+    variants: [Platinum Silver, Graphite, Sky Blue]
+
+  - productId: dell-inspiron-16
+    category: laptops
+    brandCode: DELL
+    modelName: Dell Inspiron 16 AMD Ryzen 7
+    price: 849.99
+    freeShipping: true
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.3
+    variants: [Platinum Silver, Midnight Blue, Carbon Black]
+
+  - productId: dell-inspiron-15
+    category: laptops
+    brandCode: DELL
+    modelName: Dell Inspiron 15 AMD Ryzen 5
+    price: 649.99
+    freeShipping: true
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.1
+    variants: [Platinum Silver, Carbon Black, Midnight Blue]
+
+  - productId: dell-latitude-5550
+    category: laptops
+    brandCode: DELL
+    modelName: Dell Latitude 5550 Business Laptop
+    price: 1199.99
+    freeShipping: true
+    warrantyIncluded: true
+    inStock: false   # OUT OF STOCK — eval case
+    rating: 4.4
+    variants: [Titan Grey]
+
+  - productId: dell-precision-5690
+    category: laptops
+    brandCode: DELL
+    modelName: Dell Precision 5690 Mobile Workstation
+    price: 2799.99
+    freeShipping: true
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.6
+    variants: [Platinum Silver, Graphite]
+
+  # --- LENOVO (15) ---
+  - productId: lenovo-thinkpad-x1-carbon
+    category: laptops
+    brandCode: LENOVO
+    modelName: Lenovo ThinkPad X1 Carbon Gen 12
+    price: 1699.99
+    freeShipping: true
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.7
+    variants: [Deep Black, Touch Model, Deep Black 5G]
+
+  - productId: lenovo-thinkpad-t14s
+    category: laptops
+    brandCode: LENOVO
+    modelName: Lenovo ThinkPad T14s AMD Ryzen 7
+    price: 1299.99
+    freeShipping: true
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.5
+    variants: [Thunder Black, Luna Grey]
+
+  - productId: lenovo-yoga-9i
+    category: laptops
+    brandCode: LENOVO
+    modelName: Lenovo Yoga 9i 2-in-1 Intel Core Ultra 7
+    price: 1399.99
+    freeShipping: true
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.5
+    variants: [Oatmeal, Tidal Teal, Storm Grey]
+
+  - productId: lenovo-ideapad-5-pro
+    category: laptops
+    brandCode: LENOVO
+    modelName: Lenovo IdeaPad 5 Pro AMD Ryzen 7
+    price: 899.99
+    freeShipping: true
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.3
+    variants: [Cloud Grey, Storm Grey, Abyss Blue]
+
+  - productId: lenovo-thinkbook-14
+    category: laptops
+    brandCode: LENOVO
+    modelName: Lenovo ThinkBook 14 Intel Core i7
+    price: 799.99
+    freeShipping: false
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.2
+    variants: [Arctic Grey, Mineral Grey, Sand]
+
+  - productId: lenovo-ideapad-slim3
+    category: laptops
+    brandCode: LENOVO
+    modelName: Lenovo IdeaPad Slim 3 Intel Core i5
+    price: 499.99
+    freeShipping: false
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.0
+    variants: [Arctic Grey, Abyss Blue, Pale Mint]
+
+  # ================================================================
+  # FITNESS — 50 products
+  # PELOTON: 16 | GARMIN: 18 | THERAGUN: 16
+  # ================================================================
+
+  # --- PELOTON (16) ---
+  - productId: peloton-bike-plus
+    category: fitness
+    brandCode: PELOTON
+    modelName: Peloton Bike+ Indoor Cycling Bike
+    price: 2499.99
+    freeShipping: true
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.7
+    variants: [Black, White]
+
+  - productId: peloton-bike-original
+    category: fitness
+    brandCode: PELOTON
+    modelName: Peloton Bike Original Indoor Cycling
+    price: 1445.99
+    freeShipping: true
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.6
+    variants: [Black, White]
+
+  - productId: peloton-tread-plus
+    category: fitness
+    brandCode: PELOTON
+    modelName: Peloton Tread+ Premium Treadmill
+    price: 4295.99
+    freeShipping: true
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.6
+    variants: [Black]
+
+  - productId: peloton-tread
+    category: fitness
+    brandCode: PELOTON
+    modelName: Peloton Tread Standard Treadmill
+    price: 2695.99
+    freeShipping: true
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.5
+    variants: [Black, White]
+
+  - productId: peloton-row
+    category: fitness
+    brandCode: PELOTON
+    modelName: Peloton Row Indoor Rowing Machine
+    price: 3195.99
+    freeShipping: true
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.5
+    variants: [Black]
+
+  - productId: peloton-guide
+    category: fitness
+    brandCode: PELOTON
+    modelName: Peloton Guide AI Strength Trainer
+    price: 295.99
+    freeShipping: true
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.1
+    variants: [Black, White]
+
+  - productId: peloton-mat
+    category: fitness
+    brandCode: PELOTON
+    modelName: Peloton Reversible Workout Mat
+    price: 89.99
+    freeShipping: false
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.4
+    variants: [Black, Grey]
+
+  - productId: peloton-heart-rate-band
+    category: fitness
+    brandCode: PELOTON
+    modelName: Peloton Heart Rate Band Monitor
+    price: 49.99
+    freeShipping: false
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.2
+    variants: [Black, Grey]
+
+  # --- GARMIN (18) ---
+  - productId: garmin-fenix8-solar
+    category: fitness
+    brandCode: GARMIN
+    modelName: Garmin Fenix 8 Solar GPS Multisport Watch
+    price: 899.99
+    freeShipping: true
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.8
+    variants: [Carbon Grey DLC, Sapphire Carbon Grey, Black DLC]
+
+  - productId: garmin-fenix8-standard
+    category: fitness
+    brandCode: GARMIN
+    modelName: Garmin Fenix 8 GPS Multisport Watch
+    price: 799.99
+    freeShipping: true
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.7
+    variants: [Black, Silver, Slate Grey]
+
+  - productId: garmin-forerunner965
+    category: fitness
+    brandCode: GARMIN
+    modelName: Garmin Forerunner 965 GPS Running Watch
+    price: 599.99
+    freeShipping: true
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.7
+    variants: [Black/Powder Grey, Carbon Grey, White/Gold]
+
+  - productId: garmin-forerunner265
+    category: fitness
+    brandCode: GARMIN
+    modelName: Garmin Forerunner 265 GPS Running Watch
+    price: 449.99
+    freeShipping: true
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.6
+    variants: [Black/Powder Grey, Blue/White]
+
+  - productId: garmin-forerunner165
+    category: fitness
+    brandCode: GARMIN
+    modelName: Garmin Forerunner 165 GPS Running Watch
+    price: 249.99
+    freeShipping: true
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.5
+    variants: [Black, Aqua/Moss, Lilac/White]
+
+  - productId: garmin-vivoactive5
+    category: fitness
+    brandCode: GARMIN
+    modelName: Garmin Vivoactive 5 Health Smartwatch
+    price: 299.99
+    freeShipping: true
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.5
+    variants: [Black/Slate, Ivory/Cream Gold]
+
+  - productId: garmin-instinct2-solar
+    category: fitness
+    brandCode: GARMIN
+    modelName: Garmin Instinct 2 Solar Rugged Watch
+    price: 349.99
+    freeShipping: false
+    warrantyIncluded: false
+    inStock: false   # OUT OF STOCK — eval case
+    rating: 4.6
+    variants: [Graphite, Mist Grey]
+
+  - productId: garmin-index-scale
+    category: fitness
+    brandCode: GARMIN
+    modelName: Garmin Index S2 Smart Scale
+    price: 149.99
+    freeShipping: false
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.4
+    variants: [Black, White]
+
+  # --- THERAGUN (16) ---
+  - productId: theragun-pro-plus
+    category: fitness
+    brandCode: THERAGUN
+    modelName: Theragun PRO Plus 6-in-1 Percussive Device
+    price: 599.99
+    freeShipping: true
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.7
+    variants: [Black, White]
+
+  - productId: theragun-pro-gen6
+    category: fitness
+    brandCode: THERAGUN
+    modelName: Theragun PRO Gen 6 Percussive Therapy
+    price: 499.99
+    freeShipping: true
+    warrantyIncluded: true
+    inStock: true
+    rating: 4.6
+    variants: [Black, White]
+
+  - productId: theragun-elite
+    category: fitness
+    brandCode: THERAGUN
+    modelName: Theragun Elite Percussive Device
+    price: 299.99
+    freeShipping: true
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.5
+    variants: [Black, White]
+
+  - productId: theragun-prime
+    category: fitness
+    brandCode: THERAGUN
+    modelName: Theragun Prime Essential Recovery
+    price: 199.99
+    freeShipping: true
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.4
+    variants: [Black, White, Sand]
+
+  - productId: theragun-mini2
+    category: fitness
+    brandCode: THERAGUN
+    modelName: Theragun Mini 2.0 Portable Massager
+    price: 149.99
+    freeShipping: false
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.3
+    variants: [Black, Sandstone, Desert Rose]
+
+  - productId: theragun-relief
+    category: fitness
+    brandCode: THERAGUN
+    modelName: Theragun Relief Easy-Use Massager
+    price: 99.99
+    freeShipping: false
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.2
+    variants: [Black, White]
+
+  - productId: theragun-sense
+    category: fitness
+    brandCode: THERAGUN
+    modelName: Theragun Sense Guided Wellness Device
+    price: 299.99
+    freeShipping: true
+    warrantyIncluded: false
+    inStock: true
+    rating: 4.3
+    variants: [Black, White]
+
+# ================================================================
+# VARIANT OVERRIDES — Adversarial eval cases
+# Each crosses a query threshold by a small margin.
+# ================================================================
+
+variantOverrides:
+
+  # ADV-1: "Headphones under $300" must EXCLUDE — crosses by $9.99
+  - productId: bose-qc-ultra-headphones
+    variantLabel: White Smoke
+    price: 309.99
+    reason: "Crosses $300 threshold by $9.99"
+
+  # ADV-2: "Running shoes under $150" must EXCLUDE — crosses by $1
+  - productId: nike-pegasus41
+    variantLabel: Blue/White
+    price: 151.00
+    reason: "Crosses $150 threshold by $1 — inclusive-bound test"
+
+  # ADV-3: "Furniture under $550" must EXCLUDE — crosses by $0.99
+  - productId: ikea-strandmon-wingchair
+    variantLabel: Skiftebo Yellow
+    price: 550.99
+    reason: "Crosses $550 by $0.99 — exact boundary precision"
+
+  # ADV-4: "Laptop under $1200" must EXCLUDE — crosses by $99.99
+  - productId: lenovo-thinkpad-x1-carbon
+    variantLabel: Touch Model
+    price: 1299.99
+    reason: "Crosses $1200 by $99.99"
+
+  # ADV-5: "Fitness tracker under $300" must EXCLUDE — crosses by $4.99
+  - productId: garmin-vivoactive5
+    variantLabel: Black/Slate
+    price: 304.99
+    reason: "Crosses $300 by $4.99"

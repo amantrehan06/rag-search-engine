@@ -1,0 +1,27 @@
+[
+  {
+    "id": "audio",
+    "name": "Audio",
+    "description": "Premium audio equipment for every kind of listener — from daily commuters who need noise cancellation on crowded transit, to remote workers seeking focus in open-plan offices, to audiophiles who demand studio-accurate sound reproduction. Includes wireless headphones, true wireless earbuds, and portable speakers engineered for long-haul travel, gaming sessions, gym workouts, and immersive home listening. Whether you are blocking out the world or sharing music with a room, this category covers every listening context with industry-leading sound quality, comfort, and connectivity."
+  },
+  {
+    "id": "footwear",
+    "name": "Footwear",
+    "description": "Performance athletic footwear for runners, trainers, and everyday movers — from beginners logging their first kilometres to competitive athletes chasing personal records. Covers road running shoes engineered for pavement and treadmill, trail running shoes built for uneven terrain and mud, cross-training shoes designed for gym floors and HIIT sessions, and casual sneakers that transition from workout to street. Available in standard and wide fits, with options tuned for neutral runners, overpronators, and recovery-focused walkers who prioritise cushioning and joint support."
+  },
+  {
+    "id": "furniture",
+    "name": "Furniture",
+    "description": "Quality furniture for modern living spaces — from compact apartments where every square foot matters, to dedicated home offices that need ergonomic chairs and clean desk setups, to open-plan living rooms designed for entertaining. Covers sofas, armchairs, desks, dining tables, shelving, and storage solutions in a range of materials and finishes. Suited to minimalists who want clean lines, families who need durable and easy-to-clean surfaces, renters who value flat-pack convenience, and buyers who want statement pieces that anchor a room with personality and warmth."
+  },
+  {
+    "id": "laptops",
+    "name": "Laptops",
+    "description": "High-performance laptops for professionals, creatives, students, and power users — from lightweight ultrabooks designed for business travellers who live out of a carry-on, to workstation-grade machines built for video editing, 3D rendering, and software development with demanding build toolchains. Covers thin-and-light models optimised for battery life and portability, creator laptops with colour-accurate displays and dedicated GPUs, developer machines with high core counts and large RAM ceilings, and student laptops that balance performance with affordability. Whether you write code, cut video, build presentations, or run data pipelines, this category has the right machine."
+  },
+  {
+    "id": "fitness",
+    "name": "Fitness",
+    "description": "Fitness equipment and wearables for every training style and goal — from beginners building a home gym on a budget, to serious athletes tracking performance metrics across every session, to recovery-focused buyers who want massage guns, foam rollers, and compression tools. Covers cardio equipment including indoor bikes and treadmills, strength training gear, GPS running watches and fitness trackers, and recovery devices. Suitable for small apartments with limited floor space, garage gyms with room to grow, and outdoor athletes who need accurate pace, heart rate, and route data on every run, ride, or hike."
+  }
+]
