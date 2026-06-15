@@ -52,8 +52,6 @@ public class SearchPipeline {
                     () -> intentParseStage.run(combinedQuery, sessionId, request.getMessage()), pipelineExecutor);
             CompletableFuture<ExpansionResult> expansionF = CompletableFuture.supplyAsync(
                     () -> queryExpansionStage.run(combinedQuery), pipelineExecutor);
-            CompletableFuture.allOf(intentF, expansionF).join();
-
             IntentResult    intentResult    = intentF.join();
             ExpansionResult expansionResult = expansionF.join();
 
