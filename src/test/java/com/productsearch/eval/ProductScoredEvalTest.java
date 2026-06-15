@@ -25,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(classes = ProductSearchTestApplication.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @EnabledIf("com.productsearch.eval.EvalCredentials#available")
-class ProductRagasEvalTest {
+class ProductScoredEvalTest {
 
     @Autowired private SearchPipeline searchPipeline;
     @Autowired @org.springframework.beans.factory.annotation.Qualifier("judgeModel")
@@ -91,39 +91,39 @@ class ProductRagasEvalTest {
 
     @ParameterizedTest(name = "{0}")
     @MethodSource("evalCases")
-    void runRagasEval(EvalCase evalCase) {
+    void runScoredEval(EvalCase evalCase) {
         ProductSearchResponse response = ask(evalCase.query());
         List<ProductSearchResponse.Product> products = response.getProducts();
 
-        double faithfulness     = computeFaithfulness(evalCase, products);
-        double answerRelevancy  = computeAnswerRelevancy(evalCase.query(), products);
-        double contextPrecision = computeContextPrecision(evalCase, products);
+        double constraintSatisfactionRate = computeConstraintSatisfactionRate(evalCase, products);
+        double llmRelevancyScore          = computeLlmRelevancyScore(evalCase.query(), products);
+        double topKPrecision              = computeTopKPrecision(evalCase, products);
 
         EvalResult result = new EvalResult(
                 evalCase.name(), evalCase.query(),
-                faithfulness, answerRelevancy, contextPrecision,
+                constraintSatisfactionRate, llmRelevancyScore, topKPrecision,
                 products.size()
         );
         results.add(result);
 
-        log.info("─── RAGAS | {} ───────────────────────────────────────────────", evalCase.name());
-        log.info("  Faithfulness    : {}", String.format("%.3f", faithfulness));
-        log.info("  AnswerRelevancy : {}", String.format("%.3f", answerRelevancy));
-        log.info("  ContextPrecision: {}", String.format("%.3f", contextPrecision));
+        log.info("─── SCORED EVAL | {} ───────────────────────────────────────────────", evalCase.name());
+        log.info("  ConstraintSatisfaction: {}", String.format("%.3f", constraintSatisfactionRate));
+        log.info("  LLM Relevancy      : {}", String.format("%.3f", llmRelevancyScore));
+        log.info("  TopK Precision     : {}", String.format("%.3f", topKPrecision));
         log.info("  Products returned: {}", products.size());
 
-        // Per-case gate: Faithfulness must be perfect for every constraint-bearing case.
-        // Answer Relevancy is probabilistic — only the aggregate gate in @AfterAll enforces it.
+        // Per-case gate: ConstraintSatisfaction must be perfect for every constraint-bearing case.
+        // LLM Relevancy is probabilistic — only the aggregate gate in @AfterAll enforces it.
         if (evalCase.expectNonEmpty()) {
-            assertThat(faithfulness)
-                    .as("Faithfulness for '%s' fell below 0.90", evalCase.name())
+            assertThat(constraintSatisfactionRate)
+                    .as("ConstraintSatisfaction for '%s' fell below 0.90", evalCase.name())
                     .isGreaterThanOrEqualTo(0.90);
         }
     }
 
     // ─── Metric implementations ───────────────────────────────────────────────
 
-    private double computeFaithfulness(EvalCase ec, List<ProductSearchResponse.Product> products) {
+    private double computeConstraintSatisfactionRate(EvalCase ec, List<ProductSearchResponse.Product> products) {
         if (!ec.expectNonEmpty()) {
             return products.isEmpty() ? 1.0 : 0.0;
         }
@@ -142,7 +142,7 @@ class ProductRagasEvalTest {
         return true;
     }
 
-    private double computeAnswerRelevancy(String query, List<ProductSearchResponse.Product> products) {
+    private double computeLlmRelevancyScore(String query, List<ProductSearchResponse.Product> products) {
         try {
             String systemPrompt =
                 "You are an impartial evaluator for a product-search system.\n" +
@@ -178,12 +178,12 @@ class ProductRagasEvalTest {
                     .aiMessage().text().trim();
             return Double.parseDouble(raw.replaceAll("[^0-9.]", ""));
         } catch (Exception e) {
-            log.warn("AnswerRelevancy LLM judge failed: {} — defaulting to 0.5", e.getMessage());
+            log.warn("LlmRelevancyScore LLM judge failed: {} — defaulting to 0.5", e.getMessage());
             return 0.5;
         }
     }
 
-    private double computeContextPrecision(EvalCase ec, List<ProductSearchResponse.Product> products) {
+    private double computeTopKPrecision(EvalCase ec, List<ProductSearchResponse.Product> products) {
         if (products.isEmpty()) {
             return ec.expectNonEmpty() ? 0.0 : 1.0;
         }
@@ -196,48 +196,48 @@ class ProductRagasEvalTest {
     // ─── Summary report ───────────────────────────────────────────────────────
 
     @AfterAll
-    void printRagasSummaryAndAssertThresholds() {
+    void printScoredEvalSummaryAndAssertThresholds() {
         if (results.isEmpty()) return;
 
-        double avgFaithfulness    = results.stream().mapToDouble(EvalResult::faithfulness).average().orElse(0);
-        double avgAnswerRelevancy = results.stream().mapToDouble(EvalResult::answerRelevancy).average().orElse(0);
-        double avgContextPrec     = results.stream().mapToDouble(EvalResult::contextPrecision).average().orElse(0);
+        double avgConstraintSatisfactionRate = results.stream().mapToDouble(EvalResult::constraintSatisfactionRate).average().orElse(0);
+        double avgLlmRelevancyScore          = results.stream().mapToDouble(EvalResult::llmRelevancyScore).average().orElse(0);
+        double avgTopKPrecision              = results.stream().mapToDouble(EvalResult::topKPrecision).average().orElse(0);
 
         String sep = "─".repeat(110);
         log.info("\n\n{}", sep);
-        log.info("  RAGAS EVALUATION REPORT — Product Search RAG Pipeline");
+        log.info("  SCORED EVALUATION REPORT — Product Search RAG Pipeline");
         log.info(sep);
         for (EvalResult r : results) {
             log.info("  {} | F={} AR={} CP={} | products={}",
                     truncate(r.name(), 50),
-                    String.format("%.3f", r.faithfulness()),
-                    String.format("%.3f", r.answerRelevancy()),
-                    String.format("%.3f", r.contextPrecision()),
+                    String.format("%.3f", r.constraintSatisfactionRate()),
+                    String.format("%.3f", r.llmRelevancyScore()),
+                    String.format("%.3f", r.topKPrecision()),
                     r.productsReturned());
         }
         log.info(sep);
         log.info("  AVERAGE | F={} AR={} CP={}",
-                String.format("%.3f", avgFaithfulness),
-                String.format("%.3f", avgAnswerRelevancy),
-                String.format("%.3f", avgContextPrec));
+                String.format("%.3f", avgConstraintSatisfactionRate),
+                String.format("%.3f", avgLlmRelevancyScore),
+                String.format("%.3f", avgTopKPrecision));
         log.info(sep);
-        log.info("  Thresholds: Faithfulness ≥ 0.90 | AnswerRelevancy ≥ 0.70 | ContextPrecision ≥ 0.80");
+        log.info("  Thresholds: ConstraintSatisfaction ≥ 0.90 | LLMRelevancy ≥ 0.70 | TopKPrecision ≥ 0.80");
         log.info("{}\n", sep);
 
         // ── Gate assertions — these fail the build if scores regress ──────────
-        assertThat(avgFaithfulness)
-                .as("Overall Faithfulness %.3f below the 0.90 gate. A code change likely broke a " +
-                    "metadata filter or reranker — check the per-case scores above.", avgFaithfulness)
+        assertThat(avgConstraintSatisfactionRate)
+                .as("Overall ConstraintSatisfaction %.3f below 0.90. A metadata filter or reranker " +
+                    "regression is likely — check per-case scores above.", avgConstraintSatisfactionRate)
                 .isGreaterThanOrEqualTo(0.90);
 
-        assertThat(avgAnswerRelevancy)
-                .as("Overall Answer Relevancy %.3f below the 0.70 gate. The response text is not " +
-                    "addressing user queries effectively.", avgAnswerRelevancy)
+        assertThat(avgLlmRelevancyScore)
+                .as("Overall LLMRelevancy %.3f below 0.70. The pipeline is returning products " +
+                    "misaligned with query intent.", avgLlmRelevancyScore)
                 .isGreaterThanOrEqualTo(0.70);
 
-        assertThat(avgContextPrec)
-                .as("Overall Context Precision %.3f below the 0.80 gate. The reranker or Pinecone " +
-                    "filter is leaking irrelevant results.", avgContextPrec)
+        assertThat(avgTopKPrecision)
+                .as("Overall TopKPrecision %.3f below 0.80. Reranker or filter is leaking " +
+                    "non-compliant results into top-5.", avgTopKPrecision)
                 .isGreaterThanOrEqualTo(0.80);
     }
 
@@ -246,9 +246,9 @@ class ProductRagasEvalTest {
     record EvalResult(
             String name,
             String query,
-            double faithfulness,
-            double answerRelevancy,
-            double contextPrecision,
+            double constraintSatisfactionRate,
+            double llmRelevancyScore,
+            double topKPrecision,
             int productsReturned
     ) {}
 
